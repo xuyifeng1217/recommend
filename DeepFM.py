@@ -83,23 +83,6 @@ def get_linear_logits(dense_input_dict, sparse_input_dict, sparse_feature_column
 
 # 所以FM层的操作就是，沿着隐向量维度求和(Embedding矩阵沿着n维度求和的平方 - Embedding矩阵的平方沿着n轴求和) * 0.5
 
-class FM_layer(keras.layers.Layer):
-    def __init__(self):
-        super(FM_layer, self).__init__()
-
-    def call(self, input):
-        # 优化后的公式为： 0.5 * 求和（和的平方-平方的和）  =>> b x 1
-        concated_embeds_value = input  # b*n*k
-
-        square_of_sum = tf.square(tf.reduce_sum(concated_embeds_value, axis=1, keepdims=True))  # b*1*k
-        sum_of_square = tf.reduce_sum(concated_embeds_value * concated_embeds_value, axis=1, keepdims=True)  # b*1*k
-        cross_term = square_of_sum - sum_of_square  # b*1*k
-        cross_term = 0.5 * tf.reduce_sum(cross_term, axis=2, keepdims=False)  # b*1
-        return cross_term
-
-    def compute_output_shape(self, input_shape):
-        return (None, 1)
-
 
 class FM_layer(keras.layers.Layer):
     def __init__(self):
